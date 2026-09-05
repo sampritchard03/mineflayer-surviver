@@ -35,7 +35,9 @@ export function TossItem(bot, partialName) {
             resolve = res; reject = rej;
             (async () => {
                 try {
-                    await bot.lookAt(bot.survival.target.offset(0, 1.6, 0))
+                    const t = bot.survival.target
+                    await bot.pathfinder.goto(new goals.GoalNear(t.x, t.y, t.z, 3))
+                    await bot.lookAt(t.offset(0, 1.6, 0))
                     for (let item of bot.inventory.items()) {
                         if (item.displayName.includes(partialName)) {
                             await bot.tossStack(item)

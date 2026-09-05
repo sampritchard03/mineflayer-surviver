@@ -364,7 +364,7 @@ export const surviver = async (bot) => {
         resolveSetIdle()
 
         bot.survival.stopTask()
-        bot.survival.target = null
+        bot.survival.target = bot.entity.position
 
         await timeout(200)
         
