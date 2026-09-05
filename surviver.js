@@ -53,6 +53,8 @@ export const surviver = async (bot) => {
 
     bot.inventory.weapon = () => tool("Sword")
     bot.inventory.axe = () => tool("Axe")
+    bot.inventory.shovel = () => tool("Shovel")
+    bot.inventory.pickaxe = () => tool("Pickaxe")
 
     var closestItemPos
     var freshTick = false
@@ -355,6 +357,7 @@ export const surviver = async (bot) => {
 
         resolveSetIdle()
 
+        bot.survival.stopTask()
 
         await timeout(200)
         
