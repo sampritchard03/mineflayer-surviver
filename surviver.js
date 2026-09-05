@@ -142,7 +142,7 @@ export const surviver = async (bot) => {
 
             const d = distanceXZ(dx, dz) + Math.abs(dy)
 
-            return -d + bot.survival.focus*d1
+            return -d + bot.survival.focus * d1
         }
 
         isEnd (node) {
@@ -177,7 +177,7 @@ export const surviver = async (bot) => {
                 if (bot.survival.mode != "break") return ret
 
                 if (
-                    node.distanceTo(bot.survival.target.offset(0, 1.6, 0)) > this.targRange
+                    node.distanceTo(bot.survival.target.offset(0, 1.6, 0)) > bot.survival.targRange
                 ) return false
                 // Check faces that could be seen from the current position. If the delta is smaller then 0.5 that means the bot cam most likely not see the face as the block is 1 block thick
                 // this could be false for blocks that have a smaller bounding box then 1x1x1
