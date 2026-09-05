@@ -17,6 +17,7 @@ export async function mineBlocks(bot, partialName, count) {
 }
 
 export async function tossItemsTo(bot, partialName, count, username) {
+    if (!bot.entities) return
     const testE = Object.values(bot.entities).filter(e => e.username == username)[0]
 
     if (testE && testE.position) {
