@@ -92,6 +92,7 @@ export const surviver = async (bot) => {
             cancelIdlePromise = () => {}
             idlePromise = async () => {}
             resolveSetIdle = () => {}
+            bot.pathfinder.stop()
         }
     }
 

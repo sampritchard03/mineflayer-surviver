@@ -24,7 +24,5 @@ export async function tossItemsTo(bot, partialName, count, username) {
 
         bot.survival.mode = "goNear"
         await bot.survival.performTask(TossItem(bot, partialName, count))
-    } else {
-        bot.chat("Cant find u")
     }
 }
