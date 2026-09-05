@@ -1,5 +1,9 @@
 {
   "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
   "dependencies": {
     "mineflayer": "github:GenerelSchwerz/mineflayer#dev",
     "mineflayer-auto-eat": "^5.0.3",
