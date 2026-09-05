@@ -3,7 +3,7 @@ const { goals, pathfinder, Movements } = pfr
 import { loader as autoEat } from "mineflayer-auto-eat"
 import { Vec3 } from "vec3"
 
-export const survivor = async (bot) => {
+export const surviver = async (bot) => {
     bot.loadPlugin(pathfinder)
     bot.loadPlugin(autoEat)
 

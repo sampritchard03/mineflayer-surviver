@@ -1,8 +1,8 @@
-import { survivor } from "./survivor.js"
+import { surviver } from "./surviver.js"
 import { mineBlocks, tossItemsTo } from "./actions.js";
 
 export const exports = {
-    survivor,
+    surviver,
     actions: {
         mineBlocks,
         tossItemsTo
