@@ -51,6 +51,14 @@ export const surviver = async (bot) => {
         return bestItem
     }
 
+    bot.inventory.getCount = (partialName) => {
+        var count = 0;
+        for (let item of bot.inventory.items())
+            if (item.displayName.includes(partialName))
+                count += item.count
+        return count
+    }
+
     bot.inventory.weapon = () => tool("Sword")
     bot.inventory.axe = () => tool("Axe")
     bot.inventory.shovel = () => tool("Shovel")
@@ -342,17 +350,15 @@ export const surviver = async (bot) => {
     while(true) {
         var error = false
         await bot.pathfinder.goto(new GoalAvoidMobs()).catch(e => {error = true; console.error("pfr error")})
-        console.log("Pathfinding complete")
         if (error) continue
 
         error = false
         var promise = idlePromise()
         var res = () => {}, rej = () => {}
         if (promise instanceof Array) {res = promise[1]; rej = promise[2]; promise = promise[0]}
-        cancelIdlePromise = res
+        cancelIdlePromise = () => rej("cancelled")
         await promise.catch(e => {error = true; console.error("idlePromise error: "+e)})
         cancelIdlePromise = () => {}
-        console.log("Idle promise complete")
         if (error) continue
 
         resolveSetIdle()

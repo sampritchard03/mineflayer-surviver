@@ -4,15 +4,14 @@ import pfr from "mineflayer-pathfinder";
 const { goals } = pfr
 
 export async function mineBlocks(bot, partialName, count) {
-    for (let i = 0; i < count; i++) {
+    while (bot.inventory.getCount(partialName) < count) {
         bot.survival.target = bot.findBlocks({
             matching:(block) => block.displayName.includes(partialName),
             maxDistance:32
         })[0]
-        if (bot.survival.target) {
-            bot.survival.mode = "break"
-            await bot.survival.performTask(DigBlock(bot))
-        }
+        if (!bot.survival.target) break
+        bot.survival.mode = "break"
+        await bot.survival.performTask(DigBlock(bot))
     }
 }
 
