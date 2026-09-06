@@ -9,6 +9,7 @@ export function DigBlock(bot) {
             resolve = res; reject = rej;
             (async () => {
                 try {
+
                     const block = bot.blockAt(t)
                     if (!block || block.type === 0) {
                         res()
