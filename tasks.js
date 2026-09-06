@@ -15,8 +15,8 @@ export function DigBlock(bot) {
                         return
                     }
 
-                    const axe = bot.inventory.axe()
-                    if (axe != null) await bot.equip(axe)
+                    const tool = bot.pathfinder.bestHarvestTool(block)
+                    if (tool != null) await bot.equip(tool)
                     await bot.dig(block)
                     res()
                 } catch (err) {

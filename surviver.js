@@ -92,6 +92,7 @@ export const surviver = async (bot) => {
             cancelIdlePromise = () => {}
             idlePromise = async () => {}
             resolveSetIdle = () => {}
+            bot.survival.target = bot.entity.position
             bot.pathfinder.stop()
         }
     }
@@ -280,7 +281,6 @@ export const surviver = async (bot) => {
 
             else if (
                 entity.kind === "Hostile mobs" ||
-                entity.kind === "Passive mobs" ||
                 entity.kind === "Projectiles"
             ) {
                 const d = entity.position.distanceTo(bot.entity.position)
