@@ -6,11 +6,12 @@ const { goals } = pfr
 export async function mineBlocks(bot, partialName, count) {
     const initialCount = bot.inventory.getCount(partialName)
     while (bot.inventory.getCount(partialName) < initialCount + count) {
-        bot.survival.target = bot.findBlocks({
+        const t = bot.findBlocks({
             matching:(block) => block.displayName.includes(partialName),
             maxDistance:32
         })[0]
-        if (!bot.survival.target) break
+        if (!t) return
+        bot.survival.target = t
         bot.survival.mode = "break"
         await bot.survival.performTask(DigBlock(bot))
     }

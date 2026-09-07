@@ -18,7 +18,7 @@ export function DigBlock(bot) {
 
                     const tool = bot.pathfinder.bestHarvestTool(block)
                     if (tool != null) await bot.equip(tool)
-                    await bot.dig(block)
+                    await bot.dig(block, true, 'raycast')
                     res()
                 } catch (err) {
                     rej("Cancelled while digging")
@@ -29,7 +29,7 @@ export function DigBlock(bot) {
     }
 }
 
-export function TossItem(bot, partialName) {
+export function TossItem(bot, partialName, count) {
     return () => {
         var resolve, reject
         const promise = new Promise((res, rej) => {
@@ -40,11 +40,18 @@ export function TossItem(bot, partialName) {
                     await bot.pathfinder.goto(new goals.GoalNear(t.x, t.y, t.z, 3))
                     await bot.lookAt(t.offset(0, 1.6, 0))
                     for (let item of bot.inventory.items()) {
-                        if (item.displayName.includes(partialName)) {
-                            await bot.tossStack(item)
+                        if (item.displayName.includes(partialName)) {       
+                            const oldCount = count
+                            count -= item.count     
+                            await bot.toss(item.type, item.metadata, Math.min(oldCount, item.count))
                         }
-                        res()
+                        if (count <= 0) {
+                            res()
+                            return
+                        }
                     }
+                    
+                    
                 } catch(e) {rej(e)}
             })()
         })

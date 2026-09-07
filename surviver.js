@@ -72,12 +72,14 @@ export const surviver = async (bot) => {
     var idlePromise = async () => {}
 
     bot.survival = {
-        target: new Vec3(485, 96, 499),
+        persistantTarget: bot.entity.position,
+        target: bot.entity.position,
         mode: 'break',
         nucleus: new Vec3(0, 0, 0),
         targRange: 1,
         nucRange: 10,
         focus: 0.1,
+        dontGatherTimer: 0,
         setIdlePromise: (action, cb=()=>{}) => {
             cancelIdlePromise()
             cancelIdlePromise = () => {}
@@ -92,10 +94,16 @@ export const surviver = async (bot) => {
             cancelIdlePromise = () => {}
             idlePromise = async () => {}
             resolveSetIdle = () => {}
-            bot.survival.target = bot.entity.position
+            bot.survival.target = bot.survival.persistantTarget
             bot.pathfinder.stop()
+        },
+        setPersistantTarget: (target) => {
+            bot.survival.persistantTarget = target
+            bot.survival.target = bot.survival.persistantTarget
         }
     }
+
+    bot.survival.target = bot.survival.persistantTarget
 
     
 
@@ -235,6 +243,7 @@ export const surviver = async (bot) => {
     bot.autoEat.enableAuto()
 
     var t = 0
+    var stuckTime = 0
 
     bot.on("entityHurt", entity => {
         if (entity == bot.entity) bot.survival.nucRange = 10
@@ -271,7 +280,7 @@ export const surviver = async (bot) => {
 
         for (let entity of Object.values(bot.entities)) {
 
-            if (entity.getDroppedItem() != null) {
+            if (bot.survival.dontGatherTimer <= 0 && entity.getDroppedItem() != null) {
                 const dist = entity.position.distanceTo(bot.entity.position)
                 if (dist < closestItemDist) {
                     closestItemPos = entity.position
@@ -340,6 +349,18 @@ export const surviver = async (bot) => {
             cancelIdlePromise()
         }
 
+        if (bot.entity.velocity.distanceTo(new Vec3(0, 0, 0)) < 0.2) {
+            if (stuckTime > 10 && !bot.pathfinder.isMining()) {
+                stuckTime = 0
+                bot.pathfinder.stop()
+            } else {
+                stuckTime++
+            } 
+        } else {
+            stuckTime = 0
+        }
+
+        bot.survival.dontGatherTimer--
         freshTick = true
         t++
     })
@@ -365,7 +386,7 @@ export const surviver = async (bot) => {
         resolveSetIdle()
 
         bot.survival.stopTask()
-        bot.survival.target = bot.entity.position
+        bot.survival.target = bot.survival.persistantTarget
 
         await timeout(200)
         
