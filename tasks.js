@@ -1,6 +1,17 @@
 import pfr from "mineflayer-pathfinder";
 const { goals } = pfr
 
+export function EmptyTask(bot) {
+    return () => {
+        var resolve, reject
+        const promise = new Promise((res, rej) => {
+            resolve = res; reject = rej;
+            res()
+        })
+        return [promise, resolve, reject]
+    }
+}
+
 export function DigBlock(bot) {
     return () => {
         const t = bot.survival.target.clone()

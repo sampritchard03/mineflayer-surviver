@@ -2,6 +2,7 @@ import pfr from "mineflayer-pathfinder"
 const { goals, pathfinder, Movements } = pfr
 import { loader as autoEat } from "mineflayer-auto-eat"
 import { Vec3 } from "vec3"
+import { EmptyTask } from "./tasks.js"
 
 export const surviver = async (bot) => {
     bot.loadPlugin(pathfinder)
@@ -100,6 +101,9 @@ export const surviver = async (bot) => {
         setPersistantTarget: (target) => {
             bot.survival.persistantTarget = target
             bot.survival.target = bot.survival.persistantTarget
+        },
+        awaitTarget: async () => {
+            await bot.survival.performTask(EmptyTask(bot))
         }
     }
 
@@ -167,57 +171,48 @@ export const surviver = async (bot) => {
                 ret = ret && !(dx * dx + dy * dy + dz * dz <= bot.survival.nucRange * bot.survival.nucRange)
             }
             
-            if (closestItemPos) {
-                const dx2 = closestItemPos.x - node.x
-                const dy2 = closestItemPos.y - node.y
-                const dz2 = closestItemPos.z - node.z
+            if (bot.survival.mode == "goNear") {
 
-                return ret && (dx2 * dx2 + dy2 * dy2 + dz2 * dz2) <= 1
-            } else {
+                const dx1 = bot.survival.target.x - node.x
+                const dy1 = bot.survival.target.y - node.y
+                const dz1 = bot.survival.target.z - node.z
 
-                if (bot.survival.mode == "goNear") {
-
-                    const dx1 = bot.survival.target.x - node.x
-                    const dy1 = bot.survival.target.y - node.y
-                    const dz1 = bot.survival.target.z - node.z
-
-                    return ret && (dx1 * dx1 + dy1 * dy1 + dz1 * dz1) <= bot.survival.targRange * bot.survival.targRange
-                }
-
-                if (bot.survival.mode != "break") return ret
-
-                if (
-                    node.distanceTo(bot.survival.target.offset(0, 1.6, 0)) > bot.survival.targRange
-                ) return false
-                // Check faces that could be seen from the current position. If the delta is smaller then 0.5 that means the bot cam most likely not see the face as the block is 1 block thick
-                // this could be false for blocks that have a smaller bounding box then 1x1x1
-                const dx1 = node.x - (bot.survival.target.x + 0.5)
-                const dy1 = node.y + 1.6 - (bot.survival.target.y + 0.5) // -0.5 because the bot position is calculated from the block position that is inside its feet so 0.5 - 1 = -0.5
-                const dz1 = node.z - (bot.survival.target.z + 0.5)
-                // Check y first then x and z
-                const visibleFaces = {
-                y: Math.sign(Math.abs(dy1) > 0.5 ? dy1 : 0),
-                x: Math.sign(Math.abs(dx1) > 0.5 ? dx1 : 0),
-                z: Math.sign(Math.abs(dz1) > 0.5 ? dz1 : 0)
-                }
-                const validFaces = []
-                for (const i in visibleFaces) {
-                    if (!visibleFaces[i]) {
-                        // skip as this face is not visible
-                        continue
-                    }
-                    const targetPos = new Vec3(bot.survival.target.x, bot.survival.target.y, bot.survival.target.z).offset(0.5 + (i === 'x' ? visibleFaces[i] * 0.5 : 0), 0.5 + (i === 'y' ? visibleFaces[i] * 0.5 : 0), 0.5 + (i === 'z' ? visibleFaces[i] * 0.5 : 0))
-                    const startPos = new Vec3(node.x + 0.5, node.y + 1.6, node.z + 0.5)
-                    const rayPos = bot.world.raycast(startPos, targetPos.clone().subtract(startPos).normalize(), bot.survival.targRange)?.position
-                    if (rayPos && rayPos.x === bot.survival.target.x && rayPos.y === bot.survival.target.y && rayPos.z === bot.survival.target.z) {
-                        validFaces.push({
-                            face: rayPos.face,
-                            targetPos
-                        })
-                    }
-                }
-                return ret && validFaces.length !== 0
+                return ret && (dx1 * dx1 + dy1 * dy1 + dz1 * dz1) <= bot.survival.targRange * bot.survival.targRange
             }
+
+            if (bot.survival.mode != "break") return ret
+
+            if (
+                node.distanceTo(bot.survival.target.offset(0, 1.6, 0)) > bot.survival.targRange
+            ) return false
+            // Check faces that could be seen from the current position. If the delta is smaller then 0.5 that means the bot cam most likely not see the face as the block is 1 block thick
+            // this could be false for blocks that have a smaller bounding box then 1x1x1
+            const dx1 = node.x - (bot.survival.target.x + 0.5)
+            const dy1 = node.y + 1.6 - (bot.survival.target.y + 0.5) // -0.5 because the bot position is calculated from the block position that is inside its feet so 0.5 - 1 = -0.5
+            const dz1 = node.z - (bot.survival.target.z + 0.5)
+            // Check y first then x and z
+            const visibleFaces = {
+            y: Math.sign(Math.abs(dy1) > 0.5 ? dy1 : 0),
+            x: Math.sign(Math.abs(dx1) > 0.5 ? dx1 : 0),
+            z: Math.sign(Math.abs(dz1) > 0.5 ? dz1 : 0)
+            }
+            const validFaces = []
+            for (const i in visibleFaces) {
+                if (!visibleFaces[i]) {
+                    // skip as this face is not visible
+                    continue
+                }
+                const targetPos = new Vec3(bot.survival.target.x, bot.survival.target.y, bot.survival.target.z).offset(0.5 + (i === 'x' ? visibleFaces[i] * 0.5 : 0), 0.5 + (i === 'y' ? visibleFaces[i] * 0.5 : 0), 0.5 + (i === 'z' ? visibleFaces[i] * 0.5 : 0))
+                const startPos = new Vec3(node.x + 0.5, node.y + 1.6, node.z + 0.5)
+                const rayPos = bot.world.raycast(startPos, targetPos.clone().subtract(startPos).normalize(), bot.survival.targRange)?.position
+                if (rayPos && rayPos.x === bot.survival.target.x && rayPos.y === bot.survival.target.y && rayPos.z === bot.survival.target.z) {
+                    validFaces.push({
+                        face: rayPos.face,
+                        targetPos
+                    })
+                }
+            }
+            return ret && validFaces.length !== 0
         }
 
         hasChanged () {
